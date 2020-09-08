@@ -1,15 +1,4 @@
-function getgit() {
-    var l ={};
-    fetch("https://api.github.com/users/bhavansh")
-        .then(response=>response.json())
-        .then(response=>{
-            l["metadata"] = response;
-            console.log(l)
-        })
-    
-    
-    console.log(l)
-}
+
 
 var counterskill = 1;
 function addskill(divName){
@@ -30,7 +19,20 @@ function addlanguage(divName){
     counterlanguage++;    
 }
 
-/*function loglang(){
+/*function getgit() {
+    var l ={};
+    fetch("https://api.github.com/users/bhavansh")
+        .then(response=>response.json())
+        .then(response=>{
+            l["metadata"] = response;
+            console.log(l)
+        })
+    
+    
+    console.log(l)
+}
+
+function loglang(){
     skillarr = [];
     var skill = document.getElementsByName('languages[]'); 
     for (var i = 0; i < skill.length; i++) { 
@@ -51,7 +53,34 @@ function logskills(){
     console.log(skillarr,skillarr)
 }*/
 
-function adduser(use1r){   
+
+async function postData(url, data) {
+    // Default options are marked with *
+    const obj = data;
+  
+    const response = await fetch(url, {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      //credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      //body: body // body data type must match "Content-Type" header
+      body: obj,
+    });
+    return response.json(); // parses JSON response into native JavaScript objects
+  }
+
+
+
+
+const registrationform = document.getElementById("registrationform")
+
+registrationform.addEventListener('submit', function(e) {
+    e.preventDefault();
 
     skillarr = [];
     projectsforskills = []
@@ -68,72 +97,67 @@ function adduser(use1r){
         languagearr.push(languages[i].value)      
     }
     
-    
+
+    const use1r = new FormData(this);
+
     var user = {
-        email : use1r.email.value,
-        password : use1r.pass.value,
-        Personal : {
-            name : use1r.name.value,
-            college : use1r.college.value,
-            deptartment : use1r.college.value,
-            year : use1r.year.value,
-            division : use1r.division.value,
-            rollno : use1r.rollno.value,
+        "email" : this.email.value,
+        "password" : this.pass.value,
+        "personal" : {
+            "name" : this.name.value,
+            "college" : this.college.value,
+            "deptartment" : this.college.value,
+            "year" : this.year.value,
+            "division" : this.division.value,
+            "rollno" : this.rollno.value,
         },
-        social: {
-            phone: use1r.phone.value,
-            linkedin: use1r.linkden.value,
-            github:use1r.github.value,
-            personalwebsite: use1r.personalsite.value,
-            resume: use1r.resume.value,
-            iswhatsaap: use1r.iswhatsapp.value
+        "social": {
+            "phone": this.phone.value,
+            "linkedin": this.linkden.value,
+            "github":this.github.value,
+            "personalwebsite": this.personalsite.value,
+            "resume": this.resume.value,
+            "iswhatsaap": this.iswhatsapp.value
         }, 
-        skills:{
-            skills : skillarr,
-            projectsforskills : projectsforskills,
-            topskill: use1r.topskill.value,
-            primaryskill : use1r.primaryskill.value,
-            secondaryskill : use1r.secondaryskill.value,
-            cgpa: use1r.cgpa.value
+        "skills":{
+            "skills" : skillarr,
+            "projectsforskills" : projectsforskills,
+            "topskill": this.topskill.value,
+            "primaryskill" : this.primaryskill.value,
+            "secondaryskill" : this.secondaryskill.value,
+            "cgpa": this.cgpa.value
         },
-        rating:4.5,
-        Optionals: {
-            introduction: use1r.introduction.value,
-            gender: use1r.gender.value,
-            age : use1r.age.value,
-            mother_tongue: use1r.mothertongue.value,
-            languages_known : languagearr
+        "rating":this.rating.value,
+        "optionals": {
+            "introduction": this.introduction.value,
+            "gender": this.gender.value,
+            "age" : this.age.value,
+            "mother_tongue": this.mothertongue.value,
+            "languages_known" : languagearr
         },
+        "metaData":{
+        }
     };
 
-    githublink = `https://api.github.com/users/${use1r.github.value.substr(use1r.github.value.lastIndexOf('/') + 1)}`
+
+    githublink = `https://api.github.com/users/${this.github.value.substr(this.github.value.lastIndexOf('/') + 1)}`
  
     fetch(githublink)
         .then(response=>response.json())
         .then(response=>{
-            user["metaData"] = response;
-            alert(JSON.stringify(user))
+            user["metaData"]["github_metadata_object"] = response;
         })
         .then((response) => {
-            fetch("https://skboard.herokuapp.com/api/register/student",
-            {
-                method:'POST',
-                body:JSON.stringify(user),
-                headers: {
-                        'Content-Type':'application/json'
-                },
-                credentials:'same-origin'
-            })
-            .then(alert(JSON.stringify(user)))
-            .then(console.log(user))
-            .catch(alert("Falied To post"))
+
+            let url = "https://skboard.herokuapp.com/api/register/student";
+
+            const res = postData(url, user);
+            console.log(res);
+           
         })
         .catch(console.log("Failed to get git data"))
-    
-    alert(JSON.stringify(user));
-       
-    
-}
+
+})
 
 
 
